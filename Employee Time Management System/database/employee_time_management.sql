@@ -1,49 +1,29 @@
--- Create the database if it does not already exist
-CREATE DATABASE IF NOT EXISTS employee_time_management;
+package com.yourname.timemgmt.util;
 
--- Switch to using the employee_time_management database
-USE employee_time_management;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
--- Create the employees table if it does not exist
-CREATE TABLE IF NOT EXISTS employees (
-    -- Unique identifier for each employee, auto-incremented
-                                         id INT AUTO_INCREMENT PRIMARY KEY,
-    -- Employee's full name, required and max 100 characters
-                                         name VARCHAR(100) NOT NULL,
-    -- Employee's unique email address, required
-    email VARCHAR(100) UNIQUE NOT NULL
-    );
+public class DBConnection {
 
--- Create the work_entries table if it does not exist
-CREATE TABLE IF NOT EXISTS work_entries (
-    -- Unique identifier for each work entry, auto-incremented
-                                            id INT AUTO_INCREMENT PRIMARY KEY,
-    -- Foreign key referencing employee's ID, cannot be null
-                                            employee_id INT NOT NULL,
-    -- The date of the work entry, required
-                                            work_date DATE NOT NULL,
-    -- Number of hours worked, precision 4 digits, 2 after decimal, required
-                                            hours_worked DECIMAL(4,2) NOT NULL,
-    -- Optional textual description of the work entry
-    description VARCHAR(255),
-    -- Foreign key constraint linking employee_id to employees table
-    FOREIGN KEY (employee_id) REFERENCES employees(id)
-    );
+    private static final String URL =
+            "jdbc:mysql://localhost:3306/mydb?useSSL=false&serverTimezone=UTC";
 
--- Create the time_off_requests table if it does not exist
-CREATE TABLE IF NOT EXISTS time_off_requests (
-    -- Unique identifier for each time off request, auto-incremented
-                                                 id INT AUTO_INCREMENT PRIMARY KEY,
-    -- Foreign key referencing employee's ID, cannot be null
-                                                 employee_id INT NOT NULL,
-    -- Start date of requested time off, required
-                                                 start_date DATE NOT NULL,
-    -- End date of requested time off, required
-                                                 end_date DATE NOT NULL,
-    -- Reason provided for the time off request
-                                                 reason VARCHAR(255),
-    -- Status of the request with limited allowable values, defaults to 'PENDING'
-    status ENUM('PENDING', 'APPROVED', 'REJECTED') DEFAULT 'PENDING',
-    -- Foreign key constraint linking employee_id to employees table
-    FOREIGN KEY (employee_id) REFERENCES employees(id)
-    );
+private static final String USER = "root";        // change if needed
+    private static final String PASSWORD = "root";    // change if needed
+
+    static {
+        try {
+            // Explicitly load MySQL JDBC Driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+System.out.println("✅ MySQL JDBC Driver loaded");
+} catch (ClassNotFoundException e) {
+            System.out.println("❌ MySQL JDBC Driver NOT found");
+e.printStackTrace();
+}
+    }
+
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(URL, USER, PASSWORD);
+}
+}
