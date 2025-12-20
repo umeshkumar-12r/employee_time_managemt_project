@@ -8,13 +8,13 @@ public class WorkEntry {
     private int employeeId;
     private double hoursWorked;
     private LocalDate workDate;
-    private String description;   // 🔥 Added (required by UI)
+    private String description;   //  Added (required by UI)
 
-    // 🔥 Required for UI (fixes "no suitable constructor" error)
+    //  Required for UI (fixes "no suitable constructor" error)
     public WorkEntry() {
     }
 
-    // 🔥 Constructor used by Main and tests
+    //  Constructor used by Main and tests
     public WorkEntry(int employeeId, LocalDate workDate, double hoursWorked, String description) {
         this.employeeId = employeeId;
         this.workDate = workDate;

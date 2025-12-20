@@ -14,27 +14,39 @@ import javax.swing.*;
 import java.awt.*;
 import java.time.LocalDate;
 
+/**
+ * Main Swing UI for the Employee Time Management System.
+ *
+ * This class provides tabs for:
+ * - Adding employees
+ * - Logging work entries
+ * - Submitting time off requests
+ */
 public class EmployeeTimeManagementUI extends JFrame {
 
+    // DAO instances for database operations
     private final EmployeeDAO employeeDAO = new EmployeeDAOImpl();
     private final WorkEntryDAO workEntryDAO = new WorkEntryDAOImpl();
     private final TimeOffRequestDAO timeOffRequestDAO = new TimeOffRequestDAOImpl();
 
-    // Add Employee fields
+    // -------------------- Add Employee Fields --------------------
     private JTextField txtEmpName;
     private JTextField txtEmpEmail;
 
-    // Work entry fields
+    // -------------------- Work Entry Fields --------------------
     private JTextField txtEmpIdWork;
     private JTextField txtHoursWork;
     private JTextField txtDateWork;
 
-    // Time-off fields
+    // -------------------- Time-Off Request Fields --------------------
     private JTextField txtEmpIdLeave;
     private JTextField txtStartDateLeave;
     private JTextField txtEndDateLeave;
     private JTextArea txtReasonLeave;
 
+    /**
+     * Constructor that initializes the main window.
+     */
     public EmployeeTimeManagementUI() {
         setTitle("Employee Time Management System");
         setSize(650, 420);
@@ -43,9 +55,13 @@ public class EmployeeTimeManagementUI extends JFrame {
         initUI();
     }
 
+    /**
+     * Initializes the main UI layout with tabs.
+     */
     private void initUI() {
         JTabbedPane tabbedPane = new JTabbedPane();
 
+        // Add UI tabs
         tabbedPane.addTab("Add Employee", createAddEmployeePanel());
         tabbedPane.addTab("Work Entry", createWorkEntryPanel());
         tabbedPane.addTab("Time Off Request", createTimeOffPanel());
@@ -57,21 +73,28 @@ public class EmployeeTimeManagementUI extends JFrame {
     //                  ADD EMPLOYEE TAB
     // ------------------------------------------------------
 
+    /**
+     * Creates the panel for adding a new employee.
+     */
     private JPanel createAddEmployeePanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(6, 6, 6, 6);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
+        // UI labels
         JLabel lblName = new JLabel("Employee Name:");
         JLabel lblEmail = new JLabel("Employee Email:");
 
+        // Input fields
         txtEmpName = new JTextField(20);
         txtEmpEmail = new JTextField(20);
 
+        // Button to submit employee
         JButton btnAdd = new JButton("Add Employee");
         btnAdd.addActionListener(e -> onAddEmployee());
 
+        // Layout placement
         gbc.gridx = 0; gbc.gridy = 0;
         panel.add(lblName, gbc);
         gbc.gridx = 1;
@@ -88,10 +111,14 @@ public class EmployeeTimeManagementUI extends JFrame {
         return panel;
     }
 
+    /**
+     * Handles adding a new employee.
+     */
     private void onAddEmployee() {
         String name = txtEmpName.getText().trim();
         String email = txtEmpEmail.getText().trim();
 
+        // Input validation
         if (name.isEmpty() || email.isEmpty()) {
             showError("Name and Email are required.");
             return;
@@ -102,6 +129,7 @@ public class EmployeeTimeManagementUI extends JFrame {
             return;
         }
 
+        // Create and save employee
         Employee employee = new Employee(name, email);
         int empId = employeeDAO.addEmployee(employee);
 
@@ -121,6 +149,9 @@ public class EmployeeTimeManagementUI extends JFrame {
     //                    WORK ENTRY TAB
     // ------------------------------------------------------
 
+    /**
+     * Creates the panel for logging work entries.
+     */
     private JPanel createWorkEntryPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -159,17 +190,22 @@ public class EmployeeTimeManagementUI extends JFrame {
         return panel;
     }
 
+    /**
+     * Handles saving a work entry.
+     */
     private void onSaveWorkEntry() {
         try {
             int employeeId = Integer.parseInt(txtEmpIdWork.getText().trim());
             double hours = Double.parseDouble(txtHoursWork.getText().trim());
             LocalDate date = LocalDate.parse(txtDateWork.getText().trim());
 
+            // Ensure employee exists
             if (employeeDAO.getEmployeeById(employeeId) == null) {
                 showError("Employee not found.");
                 return;
             }
 
+            // Create work entry
             WorkEntry entry = new WorkEntry();
             entry.setEmployeeId(employeeId);
             entry.setHoursWorked(hours);
@@ -192,6 +228,9 @@ public class EmployeeTimeManagementUI extends JFrame {
     //               TIME OFF REQUEST TAB
     // ------------------------------------------------------
 
+    /**
+     * Creates the panel for submitting time off requests.
+     */
     private JPanel createTimeOffPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -239,17 +278,22 @@ public class EmployeeTimeManagementUI extends JFrame {
         return panel;
     }
 
+    /**
+     * Handles submitting a time off request.
+     */
     private void onSaveTimeOffRequest() {
         try {
             int employeeId = Integer.parseInt(txtEmpIdLeave.getText().trim());
             LocalDate start = LocalDate.parse(txtStartDateLeave.getText().trim());
             LocalDate end = LocalDate.parse(txtEndDateLeave.getText().trim());
 
+            // Validate employee
             if (employeeDAO.getEmployeeById(employeeId) == null) {
                 showError("Employee not found.");
                 return;
             }
 
+            // Create time off request
             TimeOffRequest req = new TimeOffRequest();
             req.setEmployeeId(employeeId);
             req.setStartDate(start);
@@ -274,10 +318,16 @@ public class EmployeeTimeManagementUI extends JFrame {
     //                      COMMON
     // ------------------------------------------------------
 
+    /**
+     * Displays an error dialog with a message.
+     */
     private void showError(String msg) {
         JOptionPane.showMessageDialog(this, msg, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
+    /**
+     * Application entry point.
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() ->
                 new EmployeeTimeManagementUI().setVisible(true)
